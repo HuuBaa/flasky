@@ -4,10 +4,12 @@ from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
 from wtforms import StringField,SubmitField
 from wtforms.validators import Required
-import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail,Message
 from threading import Thread
+import os
+from flask_migrate import Migrate,MigrateCommand
+
 basedir=os.path.abspath(os.path.dirname(__file__))
 
 app=Flask(__name__)
@@ -40,6 +42,8 @@ bootstrap=Bootstrap(app)
 manager=Manager(app)
 db=SQLAlchemy(app)
 mail=Mail(app)
+migrate=Migrate(app,db)
+
 
 
 class NameForm(FlaskForm):
@@ -67,7 +71,7 @@ class User(db.Model):
 def make_shell_context():
     return dict(app=app,db=db,User=User,Role=Role)
 manager.add_command("shell",Shell(make_context=make_shell_context))
-
+manager.add_command("db",MigrateCommand)
 @app.route('/',methods=['POST','GET'])
 def index():
     form=NameForm()
