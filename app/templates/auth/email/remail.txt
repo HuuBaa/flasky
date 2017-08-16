@@ -1,0 +1,6 @@
+你好，{{user.username}}！
+欢迎来到Flasky！
+点击下面的链接，以完成邮箱的修改验证(有效期1小时)：
+<a href="{{url_for('auth.reset_email',token=token,_external=True)}}">{{url_for('auth.reset_email',token=token,_external=True)}}</a>
+以上，
+来自Huu.

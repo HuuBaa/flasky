@@ -1,0 +1,6 @@
+你好，{{user.username}}！
+欢迎来到Flasky！
+点击下面的链接，以完成邮箱的验证(有效期1小时)：
+{{url_for('auth.confirm',token=token,_external=True)}}
+以上，
+来自Huu.

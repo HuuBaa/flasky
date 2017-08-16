@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask,redirect,url_for,render_template,session,flash
 from flask_script import Manager,Shell
 from flask_bootstrap import Bootstrap
@@ -56,6 +57,7 @@ class Role(db.Model):
     name=db.Column(db.String(64),unique=True)
     users=db.relationship('User',backref='role',lazy='dynamic')
 
+
     def __repr__(self):
         return '<Role %r>'%self.name
 
@@ -64,14 +66,17 @@ class User(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     username=db.Column(db.String(64),unique=True,index=True)
     role_id=db.Column(db.Integer,db.ForeignKey('roles.id'))
+    
 
     def __repr__(self):
         return '<User %r>'%self.username
 
 def make_shell_context():
     return dict(app=app,db=db,User=User,Role=Role)
+
 manager.add_command("shell",Shell(make_context=make_shell_context))
 manager.add_command("db",MigrateCommand)
+
 @app.route('/',methods=['POST','GET'])
 def index():
     form=NameForm()

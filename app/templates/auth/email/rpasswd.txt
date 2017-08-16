@@ -1,0 +1,5 @@
+欢迎来到Flasky！
+点击下面的链接，进行密码的重设(有效期1小时)：
+{{url_for('auth.reset_passwd',token=token,_external=True)}}
+以上，
+来自Huu.
