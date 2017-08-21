@@ -1,0 +1,19 @@
+{%extends "base.html"%}
+{% import "_macros.html" as macros%}
+{%block title%}{{user.username}}{{title}}{%endblock%}
+{%block page_content%}
+<table class="table table-striped" >
+  <tr>
+      <th>{{user.username}}{{title}}</td>
+      <th>关注时间</td>
+  </tr>
+  {% for follow in follows %}
+  <tr>
+      <td><a href="{{url_for('main.user',username=follow.user.username)}}">{{follow.user.username}}</a></td>
+      <td>{{moment(follow.timestamp).format('LL')}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{{ macros.pagination_widget(pagination,endpoint,username=user.username)}}
+{%endblock%}
+

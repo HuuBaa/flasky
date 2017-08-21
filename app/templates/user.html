@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros%}
+{% block title %}{{user.username}}{% endblock %}
+{% block page_content %}
+<div class="page-header" style="overflow: hidden;">
+    <div class="pull-left ">
+        <img src="{{user.gravatar(size=256)}}" class="img-rounded profile-thumbnail" >
+        <hr>
+        {% if current_user.can(Permission.FOLLOW) and user != current_user %}
+            {% if not current_user.is_following(user) %}
+            <a href="{{url_for('main.follow',username=user.username)}}" class="btn-primary btn">Follow</a>
+            {% else %}
+            <a href="{{url_for('main.unfollow',username=user.username)}}" class="btn-primary btn">Unfollow</a>
+            {% endif %}
+        {% endif %}
+        <a href="{{url_for('main.following',username=user.username)}}">关注 <span class="badge">{{user.following.count()}}</span></a> 
+        <a href="{{url_for('main.followers',username=user.username)}}">粉丝 <span class="badge">{{user.followers.count()}}</span></a>
+        {% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
+        | <span class="label label-default">关注了你</span>
+        {% endif %}
+    </div>
+    <div class="pull-left" style="padding-left: 40px;">
+          <h1>{{user.username}}</h1>
+    {% if user.name or user.location %}
+    <p>
+        {%if user.name%}{{user.name}}&nbsp;&nbsp;{%endif%}
+        {%if user.location%}来自&nbsp;&nbsp;{{user.location}}{%endif%}
+    </p>
+    {% endif %}
+    {%if current_user.is_administrator()%}
+    <p><a href="MailTo:{{user.email}}">{{user.email}}</a></p>
+    {%endif%}
+    <p>关于我： {%if user.about_me%}{{user.about_me}}
+                {% else %}
+                这家伙很懒，什么都没写
+                {%endif%}</p>
+    <p>
+        注册时间：{{moment(user.member_since).format('L')}}
+    </p>
+    <p>
+        最近登录时间：{{moment(user.last_seen).fromNow(refresh=True)}}
+    </p>
+    {%if user.posts %}
+        <p>发表了{{user.posts.count()}}篇文章</p>
+    {%endif%}
+
+    {% if user==current_user %}
+    <p><a href="{{url_for('auth.cpasswd')}}">修改密码</a>  
+    <a href="{{url_for('auth.remail')}}">修改邮箱</a></p>
+    <a class="btn btn-default" href="{{url_for('main.edit_profile')}}">编辑资料</a>
+    {% endif %}
+    {% if current_user.is_administrator() %}
+    <a class="btn btn-danger" href="{{url_for('main.edit_profile_admin',id=user.id)}}">编辑资料(管理员)</a>
+    {% endif %}
+ 
+    </div>   
+    
+</div>
+{% include '_posts.html' %}
+<nav aria-label="page">
+       {{ macros.pagination_widget(pagination,'main.user',username=user.username)}}
+</nav>
+{% endblock %}

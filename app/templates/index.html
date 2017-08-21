@@ -1,5 +1,17 @@
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros%}
+{% block head %}
+{{super()}}
+<style>
+    #flask-pagedown-body{
+        height: 100px;
+    }
+    .flask-pagedown-preview{
+        padding: 10px; 
+    }
+</style>
+{% endblock %}
 {% block title%} Hello {% endblock %}
 {% block page_content %}
     <div class="page-header">
@@ -12,8 +24,17 @@
             {% endif %}!
         </h1>
     </div>
-    {% if current_user.is_authenticated %}
-    <p><a href="{{url_for('auth.cpasswd')}}">修改密码</a></p>
-    <p><a href="{{url_for('auth.remail')}}">修改邮箱</a></p>
+    {% if current_user.can(Permission.WRITE_ARTICLES)%}
+    {{wtf.quick_form(form)}}
     {% endif %}
+    <br>
+    <br>
+    {% include '_posts.html' %} 
+    <nav aria-label="page">
+       {{ macros.pagination_widget(pagination,'main.index')}}
+    </nav>
+{% endblock %}
+{% block scripts %}
+{{super()}}
+{{pagedown.include_pagedown()}}
 {% endblock %}

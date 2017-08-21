@@ -6,6 +6,20 @@ from .forms import LoginForm,RegisterForm,CPasswdForm,RPasswordForm,RPasswordFor
 from flask_login import login_user,logout_user,login_required,current_user
 from ..email import send_mail 
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated :
+        current_user.ping()
+        if not current_user.confirmed and request.endpoint[:5] != 'auth.' and request.endpoint != 'static':
+            return redirect(url_for('auth.unconfirmed'))
+
+# @auth.after_app_request
+# def teardown_request(response):
+#     if current_user.is_authenticated:
+#         current_user.ping()
+#     return response
+
 @auth.route('/auth/login',methods=['POST','GET'])
 def login():
     form=LoginForm()
@@ -51,10 +65,7 @@ def confirm(token):
         flash('邮箱验证链接无效或已经过期！')
     return redirect(url_for('main.index'))
 
-@auth.before_app_request
-def before_request():
-    if current_user.is_authenticated and not current_user.confirmed and request.endpoint[:5] != 'auth.' and request.endpoint != 'static':
-        return redirect(url_for('auth.unconfirmed'))
+
 
 @auth.route('/auth/unconfirmed')
 @login_required

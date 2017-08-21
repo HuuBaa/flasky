@@ -1,0 +1,26 @@
+
+{% for post in posts%}
+    <div class="media">
+        <div class="media-left media-top">
+        <a href="{{url_for('main.user',username=post.author.username)}}">
+          <img class="media-object" src="{{post.author.gravatar(size=60)}}">
+        </a>
+        </div>
+        <div class="media-body">
+        <h4 class="media-heading"><a href="{{url_for('main.user',username=post.author.username)}}" style="text-decoration: none;">{{post.author.username}}</a><small>（作者）发表于{{moment(post.timestamp).fromNow()}}</small></h4>
+        {% if post.body_html %}
+        {{ post.body_html | safe }}
+        {% else %}
+        {{ post.body }}
+        {% endif %}
+        </div>
+        <div class="media-footer pull-right">
+            {% if current_user == post.author %}
+            <a href="{{url_for('main.edit',id=post.id)}}"><span class="label label-primary">编辑</span></a>
+            {% elif current_user.is_administrator()%}
+            <a href="{{url_for('main.edit',id=post.id)}}"><span class="label label-danger">编辑</span></a>
+            {% endif %}
+            <a href="{{url_for('main.post',id=post.id)}}"><span class="label label-default">固定链接</span></a>
+        </div>
+    </div>
+{% endfor %}
