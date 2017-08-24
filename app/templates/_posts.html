@@ -21,6 +21,7 @@
             <a href="{{url_for('main.edit',id=post.id)}}"><span class="label label-danger">编辑</span></a>
             {% endif %}
             <a href="{{url_for('main.post',id=post.id)}}"><span class="label label-default">固定链接</span></a>
+            <a href="{{url_for('main.post',id=post.id)}}#comment"><span class="label label-default">{{post.comments.count()}}条评论</span></a>
         </div>
     </div>
 {% endfor %}

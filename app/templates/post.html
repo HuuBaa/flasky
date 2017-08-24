@@ -1,5 +1,15 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
 {% block title %}文章{% endblock %}
 {% block page_content %}
-{% include "_posts.html" %}
+    {% include "_posts.html" %}
+    <div class="page-header">
+        <h4 id="comment">评论</h1>
+    </div>
+    {{ wtf.quick_form(form) }}  
+    {% include "_comments.html" %}
+    {% if pagination.pages !=0  %}   
+    {{macros.pagination_widget(pagination,'main.post',id=posts[0].id)}}
+    {% endif %}
 {% endblock %}

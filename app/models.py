@@ -92,7 +92,7 @@ class User(UserMixin,db.Model):
     posts=db.relationship('Post',backref='author',lazy='dynamic')
     following=db.relationship('Follow',foreign_keys=[Follow.follower_id],backref=db.backref('follower',lazy='joined'),lazy='dynamic',cascade='all, delete-orphan')
     followers=db.relationship('Follow',foreign_keys=[Follow.followed_id],backref=db.backref('followed',lazy='joined'),lazy='dynamic',cascade='all, delete-orphan')
-
+    comments=db.relationship('Comment',backref='author',lazy='dynamic')
 
     def __init__(self,**kw):
         super(User,self).__init__(**kw)
@@ -225,6 +225,10 @@ class User(UserMixin,db.Model):
 
     def is_followed_by(self,user):
         return self.followers.filter_by(follower_id=user.id).first() is not None
+        
+    @property
+    def following_posts(self):
+        return Post.query.join(Follow,Post.author_id==Follow.followed_id).filter(Follow.follower_id==self.id)
 
     def __repr__(self):
         return '<User %r>'%self.username
@@ -248,7 +252,7 @@ class Post(db.Model):
     body_html=db.Column(db.Text)
     timestamp=db.Column(db.DateTime,index=True,default=datetime.utcnow)
     author_id=db.Column(db.Integer,db.ForeignKey('users.id'))
-
+    comments=db.relationship('Comment',backref='post',lazy='dynamic')
     @staticmethod
     def generate_fake(count=100):
         from random import randint,seed
@@ -273,4 +277,21 @@ class Post(db.Model):
 
 db.event.listen(Post.body,'set',Post.on_change_body)
 
+class Comment(db.Model):
+    __tablename__='comments'
+    id=db.Column(db.Integer,primary_key=True)
+    body=db.Column(db.Text)
+    body_html=db.Column(db.Text)
+    timestamp=db.Column(db.DateTime,index=True,default=datetime.utcnow)
+    author_id=db.Column(db.Integer,db.ForeignKey('users.id'))
+    post_id=db.Column(db.Integer,db.ForeignKey('posts.id'))
+    disable=db.Column(db.Boolean)
 
+    @staticmethod
+    def on_change_body(target,value,oldvalue,initiator):
+        allowed_tags=['a','abbr','acronym','b','code','em','i','strong']
+        target.body_html=bleach.linkify(bleach.clean(
+            markdown(value,output_format='html'),
+            tags=allowed_tags,strip=True))
+
+db.event.listen(Comment.body,'set',Comment.on_change_body)

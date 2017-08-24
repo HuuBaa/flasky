@@ -13,7 +13,9 @@
 </style>
 {% endblock %}
 {% block title%} Hello {% endblock %}
+
 {% block page_content %}
+
     <div class="page-header">
         <h1>
             Hello,
@@ -29,6 +31,11 @@
     {% endif %}
     <br>
     <br>
+    <ul class="nav nav-tabs">
+  <li role="presentation" {%if not show_following %} class="active"{% endif %}><a href="/all">全部</a></li>
+  <li role="presentation" {% if show_following %}class="active"{% endif%}><a href="/following">关注的</a></li> 
+</ul>
+
     {% include '_posts.html' %} 
     <nav aria-label="page">
        {{ macros.pagination_widget(pagination,'main.index')}}

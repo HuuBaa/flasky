@@ -12,6 +12,8 @@ class Config:
     MAIL_USERNAME=os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD=os.environ.get('MAIL_PASSWORD')
     FLASKY_POST_PER_PAGE=10
+    FLASKY_COMMENT_PER_PAGE=8
+    
     @staticmethod
     def init_app(app):
         pass
