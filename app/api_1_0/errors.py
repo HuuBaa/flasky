@@ -16,6 +16,6 @@ def bad_request(message):
     response.status_code=400
     return response
 
-@api.errorhandler(ValidationError):
-def validate_error(e)
+@api.errorhandler(ValidationError)
+def validate_error(e):
     return bad_request(e.args[0])

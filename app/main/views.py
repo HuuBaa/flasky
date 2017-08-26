@@ -113,7 +113,7 @@ def post(id):
     form=CommentForm()
     post=Post.query.get_or_404(id)
     if form.validate_on_submit():
-        comment=Comment(body=form.body.data,author_id=current_user.id,post=post,author=current_user._get_current_object())
+        comment=Comment(body=form.body.data,post=post,author=current_user._get_current_object())
         db.session.add(comment)
         db.session.commit()
         flash('评论发表成功')

@@ -1,22 +1,22 @@
 from . import api
-from flask import g
+from flask import g,jsonify
 from flask_httpauth import  HTTPBasicAuth
 from ..models import AnonymousUser,Post,User,Comment
 from .errors import unauthorized,forbidden,bad_request
-from .decorators import permission_required
+
 auth=HTTPBasicAuth()
 
 
 @auth.verify_password
 def verify_password(email_or_token,password):
-    if email_or_token='':
+    if email_or_token=='':
         g.current_user=AnonymousUser()
         return True
-    if password='':
+    if password=='':
         g.current_user=User.verify_auth_token(email_or_token)
         g.token_used=True
         return g.current_user is not None
-    user=User.query.filter_by(email=email).first()
+    user=User.query.filter_by(email=email_or_token).first()
     if not user:
         return False
     g.current_user=user
@@ -25,7 +25,7 @@ def verify_password(email_or_token,password):
 
 @auth.error_handler
 def auth_error():
-    return unauthorized('Invalid credentials')
+    return unauthorized('账号密码错误')
 
 @api.before_request
 @auth.login_required
@@ -40,12 +40,5 @@ def get_token():
     return jsonify({'token':g.current_user.generate_auth_token(expiration=3600),
                     'expiration':3600})
 
-@api.route('/posts/',methods=['POST'])
-def new_posts():
-    post=Post.from_json(request.json)
-    post.author=g.current_user
-    db.session.add(post)
-    db.session.commit()
-    return jsonify(post.to_json())
 
 
