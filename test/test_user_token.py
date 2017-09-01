@@ -17,16 +17,17 @@ class UserConfirmTestCase(unittest.TestCase):
 
     def test_generate_token(self):
         s=Serializer(current_app.config['SECRET_KEY'],expires_in=3600)
-        g_token=s.dumps({'confirm_id': 23,'rpasswd_email':'test'})
-        u_token=User(id=23,email='test').generate_token()
+        g_token=s.dumps({'confirm_id': 1,'rpasswd_email':'test1'})
+        u1=User(id=1,email='test1')        
+        u_token=u1.generate_token()
         self.assertTrue(g_token==u_token)
 
     def test_confirm_token(self):
-        s=Serializer(current_app.config['SECRET_KEY'],expires_in=3600)
-        g_token=s.dumps({'confirm_id': 23,'rpasswd_email':'test'})       
-        self.assertTrue(User(id=23,email='test').confirm(g_token))
+        u2=User(id=2,email='test2')
+        g_token=u2.generate_token()   
+        self.assertTrue(u2.confirm(g_token))
 
     def test_rpasswd_token(self):
-        s=Serializer(current_app.config['SECRET_KEY'],expires_in=3600)
-        g_token=s.dumps({'confirm_id': 23,'rpasswd_email':'test'})       
-        self.assertTrue(User(id=23,email='test').reset_passwd(g_token,'test'))
+        u3=User(id=3,email='test3')       
+        g_token=u3.generate_token()        
+        self.assertTrue(u3.reset_passwd(g_token,'test'))

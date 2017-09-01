@@ -7,7 +7,7 @@ from .forms import NameForm,EditProfileForm,EditProfileAdminForm,PostForm,Commen
 
 from flask_login import login_required,current_user
 from .decorators import admin_required,permission_required
-
+from flask_sqlalchemy import get_debug_queries
 @main.route('/',methods=['POST','GET'])
 def index():
     form=PostForm()
@@ -221,3 +221,22 @@ def moderate_enable(id):
     db.session.add(comment)
     db.session.commit()
     return redirect(url_for('main.moderate',page=request.args.get('page',1,type=int)))
+
+@main.route('/shutdown')
+def server_shutdown():
+    if not current_app.testing:
+        abort(404)
+    shutdown=request.environ.get('werkzeug.server.shutdown')
+    if not shutdown:
+        abort(500)
+    shutdown()
+    return 'Shut down..'
+
+@main.after_app_request
+def after_request(response):
+    for query in get_debug_queries():
+        if query.duration >= current_app.config['FLASK_SLOW_DB_QUERY_TIME']:
+            current_app.logger.warning(
+                'Slow query: %s\nParameters: %s\nDuration: %f\nContext: %s\n'%(query.statement,query.parameters,query.duration,query.context)
+                )
+    return  response

@@ -9,7 +9,7 @@
     </div>
     {{ wtf.quick_form(form) }}  
     {% include "_comments.html" %}
-    {% if pagination.pages !=0  %}   
+  
     {{macros.pagination_widget(pagination,'main.post',id=posts[0].id)}}
-    {% endif %}
+   
 {% endblock %}

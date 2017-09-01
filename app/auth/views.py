@@ -60,7 +60,7 @@ def confirm(token):
     if current_user.confirmed:
         return redirect(url_for('main.index'))
     if current_user.confirm(token):
-        flash('邮箱验证成功！感谢！')        
+        flash('邮箱验证成功！感谢')        
     else:
         flash('邮箱验证链接无效或已经过期！')
     return redirect(url_for('main.index'))

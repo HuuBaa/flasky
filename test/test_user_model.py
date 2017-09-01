@@ -7,6 +7,7 @@ class UserModelTestCase(unittest.TestCase):
         self.app_context=self.app.app_context()
         self.app_context.push()
         db.create_all()
+        Role.insert_roles()
 
     def tearDown(self):
         db.session.remove()
@@ -33,7 +34,6 @@ class UserModelTestCase(unittest.TestCase):
         self.assertFalse(u.password_hash == u2.password_hash)
 
     def test_roles_permission(self):
-        Role.insert_roles()
         u=User(email='1234@qq.com',password='test')
         self.assertTrue(u.can(Permission.WRITE_ARTICLES))
         self.assertFalse(u.can(Permission.MODERATE_COMMEMTS))
