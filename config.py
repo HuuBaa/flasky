@@ -2,7 +2,7 @@ import os
 basedir=os.path.abspath(os.path.dirname(__file__))
 class Config:
     SECRET_KEY='huu cool'
-    # SSL_DISABLE = True
+    SSL_DISABLE = True
     FLASK_MAIL_SUBJECT_PREFIX='[Flasky]'
     FLASK_MAIL_SENDER='Huu Flask <742790905@qq.com>'
     FLASKY_ADMIN=os.environ.get('FLASKY_ADMIN')
@@ -36,6 +36,7 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
+    SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
     SQLALCHEMY_DATABASE_URI=os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir,'data.sqlite')
 
     @classmethod
@@ -61,6 +62,7 @@ class ProductionConfig(Config):
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
 
+
 class HerokuConfig(ProductionConfig):
     @classmethod
     def init_app(cls, app):
@@ -71,6 +73,9 @@ class HerokuConfig(ProductionConfig):
         file_handler=SMTPHandler()
         file_handler.setLevel(logging.WARNING)
         app.logger.addHandler(file_handler)
+        
+        from werkzeug.contrib.fixers import ProxyFix
+        app.wsgi_app=ProxyFix(app.wsgi_app)
 
 config={
     'development':DevelopmentConfig,
